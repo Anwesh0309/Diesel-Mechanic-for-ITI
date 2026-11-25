@@ -28,10 +28,11 @@ export default function Sim04CommonRail() {
   const [pilot, setPilot] = useState(0);
   const [A, setA] = useState(8);
   const [locked, setLocked] = useState(false);
-  const [sc, setSc] = useState({ pilot: false, post: false });
+  const [scs, setScs] = useState([{ pilot: false, post: false }, { pilot: false, post: false }]);
   const [scOk, setScOk] = useState([false, false]);
   const [sIdx, setSIdx] = useState(0);
   const [safeOk, setSafeOk] = useState(false);
+  const sc = scs[sIdx];
   const m = model(P, pilot, A);
   const pass = m.noise <= LIM.noise && m.nox <= LIM.nox && m.soot <= LIM.soot;
 
@@ -62,7 +63,7 @@ export default function Sim04CommonRail() {
   const hints = [bi('शोर के लिए पायलट ~2 mm³, कालिख के लिए रेल दाब ~1600 bar, NOx के लिए टाइमिंग लगभग 4° BTDC।', 'Pilot ≈ 2 mm³ for noise, rail ≈ 1600 bar for soot, timing ≈ 4° BTDC for NOx.'),
     bi('पायलट = शोर घटाए; पोस्ट = DPF/उत्सर्जन में मदद।', 'Pilot = less noise; post = helps DPF/emissions.'),
     bi('इंजन बंद → बैटरी → दाब उतरने की प्रतीक्षा → तभी ढीला करें।', 'Engine off → battery → wait for pressure to drop → only then loosen.')];
-  const reset = () => { run.reset(); setPhase(0); setP(1000); setPilot(0); setA(8); setLocked(false); setSc({ pilot: false, post: false }); setScOk([false, false]); setSIdx(0); setSafeOk(false); };
+  const reset = () => { run.reset(); setPhase(0); setP(1000); setPilot(0); setA(8); setLocked(false); setScs([{ pilot: false, post: false }, { pilot: false, post: false }]); setScOk([false, false]); setSIdx(0); setSafeOk(false); };
 
   const usePilot = phase === 1 ? sc.pilot : pilot > 0; const usePost = phase === 1 && sc.post;
   const mainX = 330 - A * 4;
@@ -109,11 +110,11 @@ export default function Sim04CommonRail() {
             <div className="flex gap-2">{scen.map((_, i) => <button key={i} className={`btn !min-h-0 !py-1.5 ${i === sIdx ? '!border-cool' : ''}`} onClick={() => setSIdx(i)}>{i === 0 ? 'A' : 'B'}{scOk[i] ? ' ✓' : ''}</button>)}</div>
             <p className="font-semibold">{L(scen[sIdx].t)}</p>
             <div className="grid sm:grid-cols-3 gap-2">
-              <button className="btn" aria-pressed={sc.pilot} onClick={() => setSc({ ...sc, pilot: !sc.pilot })} data-testid="tg-pilot">{s('पायलट', 'Pilot')}: {sc.pilot ? 'ON' : 'OFF'}</button>
+              <button className="btn" aria-pressed={sc.pilot} disabled={scOk[sIdx]} onClick={() => setScs((x) => x.map((item, idx) => idx === sIdx ? { ...item, pilot: !item.pilot } : item))} data-testid="tg-pilot">{s('पायलट', 'Pilot')}: {sc.pilot ? 'ON' : 'OFF'}</button>
               <button className="btn opacity-70" disabled>{s('मुख्य', 'Main')}: ON</button>
-              <button className="btn" aria-pressed={sc.post} onClick={() => setSc({ ...sc, post: !sc.post })} data-testid="tg-post">{s('पोस्ट', 'Post')}: {sc.post ? 'ON' : 'OFF'}</button>
+              <button className="btn" aria-pressed={sc.post} disabled={scOk[sIdx]} onClick={() => setScs((x) => x.map((item, idx) => idx === sIdx ? { ...item, post: !item.post } : item))} data-testid="tg-post">{s('पोस्ट', 'Post')}: {sc.post ? 'ON' : 'OFF'}</button>
             </div>
-            <div><button className="btn btn-cool" onClick={applySc} disabled={scOk[sIdx]} data-testid="apply-sc">{s('लागू करें', 'Apply')}</button></div>
+            <div><button className="btn btn-cool" onClick={applySc} disabled={scOk[sIdx]} data-testid="apply-sc">{scOk[sIdx] ? '✓' : s('लागू करें', 'Apply')}</button></div>
           </div>
         )}
 

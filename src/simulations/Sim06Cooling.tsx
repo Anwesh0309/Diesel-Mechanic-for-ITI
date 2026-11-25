@@ -81,19 +81,52 @@ export default function Sim06Cooling() {
               <div className="w-full max-w-[220px]"><Trace data={hist} min={20} max={125} band={[82, 98]} label="temperature trace" /></div>
             </div>
             <div className="grid gap-3">
-              <svg viewBox="0 0 440 150" className="w-full h-auto" role="img" aria-label="coolant flow" data-testid="coolant-flow" data-open={f > 0 ? '1' : '0'}>
-                <rect x="20" y="30" width="130" height="90" rx="8" fill="rgb(var(--panel))" stroke="rgb(var(--mute))" strokeWidth="2.5" />
-                <text x="85" y="80" textAnchor="middle" fontSize="13" fontWeight="700" fill="rgb(var(--ink))">{s('इंजन', 'Engine')}</text>
-                <circle cx="190" cy="75" r="16" fill={f > 0 ? 'rgb(var(--ok) / .35)' : 'rgb(var(--hot) / .3)'} stroke="rgb(var(--ink))" strokeWidth="2" />
-                <text x="190" y="108" textAnchor="middle" fontSize="10" fontWeight="700" fill="rgb(var(--mute))">{s('थर्मोस्टेट', 'Thermostat')}</text>
-                <rect x="320" y="30" width="100" height="90" rx="6" fill="rgb(var(--panel))" stroke="rgb(var(--mute))" strokeWidth="2.5" />
-                {[0, 1, 2, 3, 4, 5].map((i) => <line key={i} x1="332" x2="408" y1={42 + i * 14} y2={42 + i * 14} stroke="rgb(var(--cool))" strokeWidth="2" opacity={0.3 + f * 0.7} />)}
-                <line x1="150" y1="75" x2="174" y2="75" stroke="rgb(var(--cool))" strokeWidth="5" />
-                <line x1="206" y1="75" x2="320" y2="75" stroke="rgb(var(--cool))" strokeWidth="5" strokeDasharray="10 8" className={f > 0 ? 'animate-flow' : ''} opacity={f > 0 ? 1 : 0.2} />
-                <path d="M190 59 V 18 H85 V 30" fill="none" stroke="rgb(var(--amber))" strokeWidth="4" strokeDasharray="8 6" className={on ? 'animate-flow' : ''} opacity={f < 1 ? 1 : 0.2} />
-                <path d="M370 120 V 140 H 85 V 120" fill="none" stroke="rgb(var(--cool))" strokeWidth="4" strokeDasharray="8 6" className={f > 0 ? 'animate-flow' : ''} opacity={f > 0 ? 1 : 0.2} />
-                {fan && <g transform="translate(440,75)" ><text x="-14" y="5" fontSize="22">💨</text></g>}
-                <text x="370" y="22" textAnchor="middle" fontSize="12" fontWeight="700" fill="rgb(var(--ink))">{s('रेडिएटर', 'Radiator')}</text>
+              <svg viewBox="0 0 440 160" className="w-full h-auto rounded-lg overflow-hidden border border-line bg-panel" role="img" aria-label="coolant flow" data-testid="coolant-flow" data-open={f > 0 ? '1' : '0'}>
+                {/* Engine Water Jacket Block */}
+                <rect x="18" y="26" width="134" height="96" rx="8" fill="rgb(var(--panel2))" stroke="rgb(var(--line))" strokeWidth="2" />
+                <rect x="26" y="34" width="118" height="80" rx="4" fill="rgb(var(--bg))" />
+                {/* Cylinder liners */}
+                {[0, 1, 2].map((k) => (
+                  <rect key={k} x={36 + k * 38} y="42" width="28" height="64" rx="2" fill="rgb(var(--panel))" stroke="rgb(var(--line))" />
+                ))}
+                <text x="85" y="80" textAnchor="middle" fontSize="11" fontWeight="800" fill="rgb(var(--cool))">{s('इंजन ब्लॉक', 'ENGINE')}</text>
+
+                {/* Thermostat Housing & Valve */}
+                <rect x="176" y="58" width="36" height="34" rx="6" fill="rgb(var(--panel2))" stroke="rgb(var(--line))" strokeWidth="2" />
+                <circle cx="194" cy="75" r="13" fill={f > 0 ? 'rgb(var(--ok) / .3)' : 'rgb(var(--hot) / .3)'} stroke="rgb(var(--ink))" strokeWidth="1.5" />
+                <path d={`M${194 - 8 + f * 10} 69 v12`} stroke={f > 0 ? 'rgb(var(--ok))' : 'rgb(var(--hot))'} strokeWidth="3" strokeLinecap="round" />
+                <text x="194" y="104" textAnchor="middle" fontSize="9" fontWeight="700" fill="rgb(var(--mute))">{s('थर्मोस्टेट', 'Thermostat')}</text>
+
+                {/* Radiator Assembly */}
+                <rect x="315" y="24" width="95" height="100" rx="6" fill="rgb(var(--panel2))" stroke="rgb(var(--line))" strokeWidth="2" />
+                <rect x="323" y="32" width="79" height="84" rx="4" fill="rgb(var(--bg))" />
+                {/* Radiator cooling tubes */}
+                {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+                  <line key={i} x1="327" x2="397" y1={38 + i * 12} y2={38 + i * 12} stroke="rgb(var(--cool))" strokeWidth="2" opacity={0.25 + f * 0.75} />
+                ))}
+                <text x="362" y="20" textAnchor="middle" fontSize="10.5" fontWeight="700" fill="rgb(var(--ink))">{s('रेडिएटर', 'Radiator')}</text>
+
+                {/* Flow lines */}
+                {/* Engine head to thermostat */}
+                <line x1="144" y1="75" x2="176" y2="75" stroke={T > 80 ? 'rgb(var(--hot))' : 'rgb(var(--cool))'} strokeWidth="6" strokeLinecap="round" />
+                {/* Thermostat to Radiator top */}
+                <line x1="212" y1="75" x2="315" y2="75" stroke="rgb(var(--hot))" strokeWidth="6" strokeDasharray="8 6" className={f > 0 ? 'animate-flow' : ''} opacity={f > 0 ? 1 : 0.2} strokeLinecap="round" />
+                {/* Bypass Pipe (Thermostat down back to Engine inlet) */}
+                <path d="M194 58 V 16 H85 V 26" fill="none" stroke="rgb(var(--amber))" strokeWidth="4.5" strokeDasharray="6 5" className={on ? 'animate-flow' : ''} opacity={f < 0.9 ? 1 : 0.25} />
+                <text x="140" y="13" textAnchor="middle" fontSize="8" fontWeight="bold" fill="rgb(var(--amber))">{s('बाईपास', 'BYPASS')}</text>
+                {/* Cold Return (Radiator bottom to Engine water pump) */}
+                <path d="M362 124 V 144 H 85 V 122" fill="none" stroke="rgb(var(--cool))" strokeWidth="5" strokeDasharray="8 6" className={f > 0 ? 'animate-flow' : ''} opacity={f > 0 ? 1 : 0.25} />
+
+                {/* Radiator Cooling Fan */}
+                <g transform="translate(416, 74)">
+                  <circle r="16" fill="rgb(var(--panel))" stroke={fan ? 'rgb(var(--cool))' : 'rgb(var(--mute))'} strokeWidth="2" />
+                  <g className={fan ? 'animate-spin' : ''} style={{ transformOrigin: '0px 0px' }}>
+                    {[0, 90, 180, 270].map((deg) => (
+                      <line key={deg} x1="0" y1="0" x2="0" y2="-12" transform={`rotate(${deg})`} stroke={fan ? 'rgb(var(--cool))' : 'rgb(var(--mute))'} strokeWidth="4" strokeLinecap="round" />
+                    ))}
+                  </g>
+                  {fan && <text x="18" y="4" fontSize="12" fontWeight="bold" fill="rgb(var(--cool))">AIR</text>}
+                </g>
               </svg>
               <div className="flex flex-wrap items-center gap-2">
                 {phase === 0 && <>

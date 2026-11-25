@@ -98,6 +98,62 @@ export default function Sim08Multimeter() {
             <div className="text-xs text-mute">{s('दर्ज आवश्यक माप', 'Required readings logged')}: <span className="readout text-cool" data-testid="req-count">{c.req.filter((k) => got.includes(k)).length}/{c.req.length}</span></div>
           </div>
         </div>
+
+        {/* Interactive Electrical Circuit Probe Diagram */}
+        <div className="panel p-3">
+          <div className="text-xs font-bold uppercase tracking-wider text-mute mb-2">{s('परीक्षण बिंदु (टर्मिनल दबाकर लीड लगाएँ)', 'Test points (tap terminals to attach leads)')}</div>
+          <svg viewBox="0 0 560 140" className="w-full h-auto rounded-lg bg-panel2 border border-line" role="group" aria-label="circuit diagram">
+            {/* Battery */}
+            <rect x="25" y="30" width="110" height="75" rx="6" fill="rgb(var(--panel))" stroke="rgb(var(--line))" strokeWidth="2" />
+            <text x="80" y="72" textAnchor="middle" fontSize="10" fontWeight="bold" fill="rgb(var(--mute))">BATTERY</text>
+            {/* BPOS */}
+            <g className="cursor-pointer" onClick={() => setRed('bpos')} role="button" tabIndex={0} aria-label="Battery Positive">
+              <circle cx="50" cy="30" r="14" fill={red === 'bpos' ? 'rgb(var(--hot))' : 'rgb(var(--hot) / .3)'} stroke="rgb(var(--hot))" strokeWidth="2" />
+              <text x="50" y="34" textAnchor="middle" fontSize="11" fontWeight="bold" fill="#fff">+</text>
+            </g>
+            {/* BNEG */}
+            <g className="cursor-pointer" onClick={() => setBlk('bneg')} role="button" tabIndex={0} aria-label="Battery Negative">
+              <circle cx="110" cy="30" r="14" fill={blk === 'bneg' ? '#334155' : 'rgb(var(--mute) / .3)'} stroke="rgb(var(--ink))" strokeWidth="2" />
+              <text x="110" y="34" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#fff">−</text>
+            </g>
+
+            {/* Heavy cables */}
+            <path d="M50 30 C50 15, 230 15, 250 35" fill="none" stroke="rgb(var(--hot) / .6)" strokeWidth="4" />
+            <path d="M110 30 C110 120, 200 115, 250 115" fill="none" stroke="rgb(var(--mute) / .6)" strokeWidth="4" />
+
+            {/* Engine Block / Ground */}
+            <rect x="215" y="80" width="130" height="48" rx="6" fill="rgb(var(--panel))" stroke="rgb(var(--line))" strokeWidth="2" />
+            <text x="280" y="108" textAnchor="middle" fontSize="10" fontWeight="bold" fill="rgb(var(--mute))">ENGINE BLOCK</text>
+            {/* BLOCK terminal */}
+            <g className="cursor-pointer" onClick={() => setBlk('block')} role="button" tabIndex={0} aria-label="Engine Block Ground">
+              <circle cx="280" cy="80" r="14" fill={blk === 'block' ? '#334155' : 'rgb(var(--mute) / .3)'} stroke="rgb(var(--line))" strokeWidth="2" />
+              <text x="280" y="84" textAnchor="middle" fontSize="9" fontWeight="bold" fill="rgb(var(--cool))">GND</text>
+            </g>
+
+            {/* Starter Motor */}
+            <rect x="235" y="24" width="90" height="48" rx="6" fill="rgb(var(--panel))" stroke="rgb(var(--line))" strokeWidth="2" />
+            <text x="280" y="52" textAnchor="middle" fontSize="10" fontWeight="bold" fill="rgb(var(--mute))">STARTER</text>
+            {/* SPOS terminal */}
+            <g className="cursor-pointer" onClick={() => setRed('spos')} role="button" tabIndex={0} aria-label="Starter Positive">
+              <circle cx="250" cy="24" r="14" fill={red === 'spos' ? 'rgb(var(--hot))' : 'rgb(var(--hot) / .3)'} stroke="rgb(var(--hot))" strokeWidth="2" />
+              <text x="250" y="28" textAnchor="middle" fontSize="9" fontWeight="bold" fill="#fff">S+</text>
+            </g>
+
+            {/* Alternator */}
+            <circle cx="450" cy="65" r="36" fill="rgb(var(--panel))" stroke="rgb(var(--line))" strokeWidth="2" />
+            <circle cx="450" cy="65" r="16" fill="rgb(var(--panel2))" stroke="rgb(var(--line))" />
+            <text x="450" y="116" textAnchor="middle" fontSize="10" fontWeight="bold" fill="rgb(var(--mute))">ALTERNATOR</text>
+            {/* ABPOS terminal */}
+            <g className="cursor-pointer" onClick={() => setRed('abpos')} role="button" tabIndex={0} aria-label="Alternator B+">
+              <circle cx="450" cy="29" r="14" fill={red === 'abpos' ? 'rgb(var(--hot))' : 'rgb(var(--hot) / .3)'} stroke="rgb(var(--hot))" strokeWidth="2" />
+              <text x="450" y="33" textAnchor="middle" fontSize="9" fontWeight="bold" fill="#fff">B+</text>
+            </g>
+
+            {/* Probe cable lines overlay */}
+            <text x="540" y="24" textAnchor="end" fontSize="10" fontWeight="bold" fill="rgb(var(--hot))">🔴 RED: {red.toUpperCase()}</text>
+            <text x="540" y="40" textAnchor="end" fontSize="10" fontWeight="bold" fill="rgb(var(--cool))">⚫ BLK: {blk.toUpperCase()}</text>
+          </svg>
+        </div>
         <div>
           <p className="text-sm font-semibold mb-2">{s('आपका निदान:', 'Your diagnosis:')}</p>
           <div className="grid gap-2 sm:grid-cols-2">{DIAG.map((d, i) => <button key={i} data-diag={i} onClick={() => diagnose(i)} disabled={diagOk[phase]} className={`btn !justify-start text-left ${diagOk[phase] && i === c.ans ? '!bg-ok !text-bg' : ''}`}>{L(d)}</button>)}</div>

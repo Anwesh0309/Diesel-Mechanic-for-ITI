@@ -67,7 +67,42 @@ export default function Sim09Diagnosis() {
       title={bi('डायग्नोस्टिक केस बे', 'Diagnostic case bay')}
       intro={bi('लक्षण पढ़ें, ज़रूरी परीक्षण ही चुनें और मूल कारण बताएँ। कम परीक्षणों में सही निदान पर अधिक अंक मिलते हैं।', 'Read the symptoms, choose only the tests you need and name the root cause. Fewer tests to a correct diagnosis score more.')}>
       <div className="grid gap-4">
-        <div className="rounded-md border border-line bg-panel p-3"><div className="font-bold">{L(c.title)}</div><p className="text-sm text-mute">{L(c.story)}</p></div>
+        <div className="rounded-md border border-line bg-panel p-3 flex flex-wrap sm:flex-nowrap items-center gap-4">
+          <div className="w-20 h-16 sm:w-24 sm:h-20 shrink-0 rounded-lg bg-panel2 border border-line grid place-items-center relative overflow-hidden" aria-hidden="true">
+            <svg viewBox="0 0 100 80" className="w-full h-full">
+              <rect x="0" y="44" width="34" height="18" rx="2" fill="rgb(var(--mute))" stroke="rgb(var(--ink))" strokeWidth="1.5" />
+              <ellipse cx="34" cy="53" rx="5" ry="9" fill="rgb(var(--bg))" stroke="rgb(var(--ink))" strokeWidth="1.5" />
+              {phase === 0 && (
+                <g className="animate-pulse">
+                  <circle cx="48" cy="48" r="9" fill="#1e293b" opacity="0.85" />
+                  <circle cx="64" cy="40" r="14" fill="#0f172a" opacity="0.9" />
+                  <circle cx="82" cy="30" r="18" fill="#020617" opacity="0.95" />
+                </g>
+              )}
+              {phase === 1 && (
+                <g className="animate-pulse">
+                  <circle cx="48" cy="48" r="9" fill="#38bdf8" opacity="0.4" />
+                  <circle cx="64" cy="40" r="14" fill="#0284c7" opacity="0.5" />
+                  <circle cx="82" cy="30" r="18" fill="#0369a1" opacity="0.6" />
+                </g>
+              )}
+              {phase === 2 && (
+                <g className="animate-pulse">
+                  <circle cx="48" cy="48" r="9" fill="#f8fafc" opacity="0.75" />
+                  <circle cx="64" cy="40" r="14" fill="#e2e8f0" opacity="0.85" />
+                  <circle cx="82" cy="30" r="18" fill="#ffffff" opacity="0.9" />
+                </g>
+              )}
+            </svg>
+            <span className="absolute bottom-1 text-[9px] font-bold uppercase tracking-wider text-mute">
+              {phase === 0 ? s('काला धुआँ', 'BLACK') : phase === 1 ? s('नीला धुआँ', 'BLUE') : s('सफ़ेद धुआँ', 'WHITE')}
+            </span>
+          </div>
+          <div className="min-w-0">
+            <div className="font-bold text-lg">{L(c.title)}</div>
+            <p className="text-sm text-mute mt-0.5">{L(c.story)}</p>
+          </div>
+        </div>
         <div className="grid md:grid-cols-2 gap-4">
           <div>
             <div className="text-xs font-bold uppercase tracking-wider text-mute mb-2">{s('परीक्षण चुनें', 'Choose a test')} · <span className="readout text-cool" data-testid="tests-used">{u.length}</span> {s('प्रयुक्त', 'used')}</div>
