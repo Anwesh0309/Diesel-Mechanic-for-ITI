@@ -75,19 +75,99 @@ export default function Sim05Turbo() {
       title={bi('टर्बो बूस्ट लैब', 'Turbo boost lab')}
       intro={bi('वेस्टगेट से बूस्ट नियंत्रित करें, इंटरकूलर का असर देखें और हवा का रिसाव खोजें।', 'Control boost with the wastegate, see the intercooler effect and hunt a boost leak.')}>
       <div className="grid gap-4">
-        <svg viewBox="0 0 640 190" className="w-full h-auto" role="group" aria-label="intake path" data-testid="air-path">
-          <line x1="20" y1="100" x2="620" y2="100" stroke="rgb(var(--cool))" strokeWidth="5" opacity=".35" />
-          {PARTS.map((p) => (
-            <g key={p.id} className={phase === 2 && !ok[2] ? 'cursor-pointer' : ''} role={phase === 2 ? 'button' : undefined} tabIndex={phase === 2 ? 0 : -1} aria-label={L(bi(p.hi, p.en))} data-part={p.id}
-              onClick={() => pick(p.id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') pick(p.id); }}>
-              <rect x={p.x} y="62" width={p.w} height="76" rx="8" fill={p.id === 'ic' ? 'rgb(var(--cool) / .18)' : 'rgb(var(--panel))'} stroke={phase === 2 && !ok[2] ? 'rgb(var(--amber))' : 'rgb(var(--mute))'} strokeWidth="2.5" strokeDasharray={phase === 2 && !ok[2] ? '5 4' : undefined} />
-              {p.id === 'ic' && [0, 1, 2, 3, 4, 5].map((i) => <line key={i} x1={p.x + 12 + i * 17} x2={p.x + 12 + i * 17} y1="70" y2="130" stroke="rgb(var(--cool))" strokeWidth="2" opacity={ic ? 1 : 0.35} />)}
-              <text x={p.x + p.w / 2} y="155" textAnchor="middle" fontSize="10.5" fontWeight="700" fill="rgb(var(--ink))">{L(bi(p.hi, p.en))}</text>
-              {leak && p.id === 'hoseB' && <g>{[0, 1, 2].map((i) => <circle key={i} cx={p.x + 20 + i * 24} cy={50 - i * 6} r="5" fill="rgb(var(--mute) / .6)" className="animate-pulse" />)}</g>}
+        <svg viewBox="0 0 640 190" className="w-full h-auto rounded-lg overflow-hidden border border-line" role="group" aria-label="intake path" data-testid="air-path">
+          <defs>
+            <linearGradient id="boost-flow" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="rgb(var(--cool))" stopOpacity="0.2" />
+              <stop offset="50%" stopColor="rgb(var(--cool))" stopOpacity="0.8" />
+              <stop offset="100%" stopColor="rgb(var(--amber))" stopOpacity="0.6" />
+            </linearGradient>
+            <pattern id="ic-fins" width="8" height="8" patternUnits="userSpaceOnUse">
+              <line x1="0" y1="0" x2="8" y2="0" stroke="rgb(var(--cool))" strokeWidth="1" opacity="0.4" />
+            </pattern>
+          </defs>
+
+          <rect width="640" height="190" fill="rgb(var(--panel))" />
+
+          <path d="M70 100 L180 100 L320 100 L460 100 L580 100" stroke="url(#boost-flow)" strokeWidth="16" strokeLinecap="round" opacity="0.45" />
+          <path d="M70 100 L180 100 L320 100 L460 100 L580 100" stroke="rgb(var(--cool))" strokeWidth="2" strokeDasharray="8 6" className="animate-flow" />
+
+          {PARTS.map((p) => {
+            const isTarget = phase === 2 && !ok[2];
+            return (
+              <g key={p.id} className={isTarget ? 'cursor-pointer' : ''} role={phase === 2 ? 'button' : undefined} tabIndex={phase === 2 ? 0 : -1} aria-label={L(bi(p.hi, p.en))} data-part={p.id}
+                onClick={() => pick(p.id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') pick(p.id); }}>
+                <rect x={p.x} y="58" width={p.w} height="84" rx="10"
+                  fill={p.id === 'ic' ? 'rgb(var(--cool) / .12)' : 'rgb(var(--panel2))'}
+                  stroke={isTarget ? 'rgb(var(--amber))' : 'rgb(var(--line))'}
+                  strokeWidth={isTarget ? 3 : 2}
+                  strokeDasharray={isTarget ? '6 4' : undefined}
+                  className={isTarget ? 'animate-pulse' : ''} />
+
+                {p.id === 'filter' && (
+                  <g>
+                    {[0, 1, 2, 3].map((k) => (
+                      <line key={k} x1={p.x + 16 + k * 18} y1="68" x2={p.x + 16 + k * 18} y2="132" stroke="rgb(var(--mute))" strokeWidth="3" />
+                    ))}
+                    <rect x={p.x + 8} y="64" width={p.w - 16} height="72" rx="4" fill="none" stroke="rgb(var(--line))" strokeWidth="1.5" />
+                  </g>
+                )}
+
+                {p.id === 'compOut' && (
+                  <g>
+                    <path d={`M${p.x + 12} 78 C${p.x + 40} 70, ${p.x + 50} 130, ${p.x + 78} 122`} fill="none" stroke="rgb(var(--ink))" strokeWidth="10" strokeLinecap="round" />
+                    <circle cx={p.x + 20} cy={80} r="7" fill="rgb(var(--amber))" />
+                    <circle cx={p.x + 70} cy={120} r="7" fill="rgb(var(--amber))" />
+                  </g>
+                )}
+
+                {p.id === 'ic' && (
+                  <g>
+                    <rect x={p.x + 8} y="66" width={p.w - 16} height="68" rx="4" fill="url(#ic-fins)" stroke="rgb(var(--cool) / .5)" strokeWidth="1.5" />
+                    {[0, 1, 2, 3, 4, 5].map((i) => (
+                      <line key={i} x1={p.x + 14 + i * 16} x2={p.x + 14 + i * 16} y1="68" y2="132" stroke="rgb(var(--cool))" strokeWidth="2.5" opacity={ic ? 1 : 0.4} />
+                    ))}
+                  </g>
+                )}
+
+                {p.id === 'hoseB' && (
+                  <g>
+                    <rect x={p.x + 16} y="74" width={p.w - 32} height="52" rx="6" fill="rgb(var(--panel))" stroke="rgb(var(--mute))" strokeWidth="2" />
+                    <rect x={p.x + 36} y="70" width="16" height="60" rx="3" fill="#94a3b8" stroke="#475569" strokeWidth="1.5" />
+                    <circle cx={p.x + 44} cy={76} r="3" fill="#475569" />
+                  </g>
+                )}
+
+                {p.id === 'manifold' && (
+                  <g>
+                    {[0, 1, 2, 3].map((k) => (
+                      <path key={k} d={`M${p.x + 14 + k * 16} 70 L${p.x + 14 + k * 16} 130`} stroke="rgb(var(--mute))" strokeWidth="5" strokeLinecap="round" />
+                    ))}
+                  </g>
+                )}
+
+                <text x={p.x + p.w / 2} y="162" textAnchor="middle" fontSize="11" fontWeight="700" fill="rgb(var(--ink))">{L(bi(p.hi, p.en))}</text>
+
+                {leak && p.id === 'hoseB' && (
+                  <g transform={`translate(${p.x + 44}, 54)`}>
+                    <circle cx="-10" cy="-6" r="5" fill="rgb(var(--hot) / .7)" className="animate-ping" />
+                    <circle cx="8" cy="-12" r="7" fill="rgb(var(--amber) / .6)" className="animate-ping" />
+                    <text x="0" y="-18" textAnchor="middle" fontSize="10" fontWeight="bold" fill="rgb(var(--hot))">HISS!</text>
+                  </g>
+                )}
+              </g>
+            );
+          })}
+
+          <g transform="translate(130,28)">
+            <circle r="22" fill="rgb(var(--panel2))" stroke="rgb(var(--ink))" strokeWidth="2.5" />
+            <g style={{ transformOrigin: '0px 0px', transform: `rotate(${rot}deg)` }}>
+              {[0, 60, 120, 180, 240, 300].map((a) => (
+                <line key={a} x1="0" y1="0" x2="0" y2="-18" transform={`rotate(${a})`} stroke="rgb(var(--cool))" strokeWidth="3.5" strokeLinecap="round" />
+              ))}
             </g>
-          ))}
-          <g transform="translate(130,30)"><circle r="22" fill="rgb(var(--panel2))" stroke="rgb(var(--ink))" strokeWidth="2.5" /><g style={{ transformOrigin: '0px 0px', transform: `rotate(${rot}deg)` }}>{[0, 60, 120, 180, 240, 300].map((a) => <line key={a} x1="0" y1="0" x2="0" y2="-18" transform={`rotate(${a})`} stroke="rgb(var(--cool))" strokeWidth="3" />)}</g></g>
-          <text x="130" y="66" textAnchor="middle" fontSize="10" fill="rgb(var(--mute))">{s('टर्बो', 'Turbo')}</text>
+          </g>
+          <text x="130" y="62" textAnchor="middle" fontSize="10" fontWeight="bold" fill="rgb(var(--cool))">{s('टर्बो', 'TURBO')}</text>
         </svg>
 
         <div className="grid md:grid-cols-[auto_1fr] gap-4 items-start">

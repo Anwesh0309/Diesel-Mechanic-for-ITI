@@ -73,19 +73,105 @@ export default function Sim07ServiceBay() {
       intro={bi('ग्राहक का ट्रक सर्विस के लिए आया है: जाँच करें, सही पार्ट चुनें और अगली सर्विस तय करें।', "The customer's truck is in for service: inspect it, pick the right parts and set the next service.")}>
       {phase === 0 && (
         <div className="grid gap-3" data-testid="walkaround">
-          <svg viewBox="0 0 640 260" className="w-full h-auto" role="group" aria-label="engine bay">
-            <rect x="30" y="20" width="580" height="220" rx="14" fill="rgb(var(--panel))" stroke="rgb(var(--mute))" strokeWidth="2.5" />
-            <rect x="190" y="90" width="190" height="110" rx="8" fill="rgb(var(--panel2))" stroke="rgb(var(--line))" strokeWidth="2" /><text x="285" y="150" textAnchor="middle" fontSize="13" fill="rgb(var(--mute))">{s('इंजन', 'ENGINE')}</text>
-            <ellipse cx="80" cy="150" rx="26" ry="42" fill="none" stroke="rgb(var(--mute))" strokeWidth="3" /><rect x="470" y="40" width="70" height="46" rx="5" fill="rgb(var(--bg))" stroke="rgb(var(--line))" />
-            <rect x="535" y="150" width="60" height="36" rx="4" fill="rgb(var(--ok) / .25)" stroke="rgb(var(--line))" /><rect x="395" y="140" width="40" height="50" rx="6" fill="rgb(var(--cool) / .2)" stroke="rgb(var(--line))" />
-            <rect x="262" y="230" width="48" height="6" rx="3" fill="rgb(var(--amber) / .7)" />
+          <svg viewBox="0 0 640 260" className="w-full h-auto rounded-lg overflow-hidden border border-line" role="group" aria-label="engine bay">
+            <defs>
+              <filter id="spot-shadow" x="-30%" y="-30%" width="160%" height="160%">
+                <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="#000" floodOpacity="0.65"/>
+              </filter>
+              <pattern id="radiator-fins" width="6" height="6" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="6" y2="0" stroke="rgb(var(--cool))" strokeWidth="1" opacity="0.3" />
+              </pattern>
+            </defs>
+
+            {/* Engine Bay Outer Chassis */}
+            <rect x="15" y="10" width="610" height="240" rx="14" fill="rgb(var(--panel))" stroke="rgb(var(--line))" strokeWidth="2.5" />
+            {/* Front crossmember & radiator frame */}
+            <rect x="130" y="20" width="380" height="26" rx="4" fill="rgb(var(--panel2))" stroke="rgb(var(--line))" strokeWidth="1.5" />
+            <rect x="140" y="24" width="360" height="18" fill="url(#radiator-fins)" />
+            {/* Radiator Pressure Cap */}
+            <rect x="300" y="16" width="30" height="8" rx="2" fill="rgb(var(--amber) / .8)" stroke="rgb(var(--ink))" strokeWidth="1" />
+            <text x="315" y="23" textAnchor="middle" fontSize="7" fontWeight="bold" fill="rgb(var(--bg))">PRESS</text>
+
+            {/* Front Serpentine Belt & Pulleys (Left side: belt at x=80, y=158) */}
+            <g id="drive-belt-system">
+              <circle cx="80" cy="188" r="28" fill="rgb(var(--panel2))" stroke="rgb(var(--mute))" strokeWidth="3" />
+              <circle cx="80" cy="188" r="14" fill="rgb(var(--bg))" stroke="rgb(var(--line))" strokeWidth="2" />
+              <circle cx="85" cy="122" r="18" fill="rgb(var(--panel2))" stroke="rgb(var(--mute))" strokeWidth="2.5" />
+              <circle cx="85" cy="122" r="8" fill="rgb(var(--bg))" />
+              <circle cx="112" cy="155" r="14" fill="rgb(var(--panel2))" stroke="rgb(var(--mute))" strokeWidth="2" />
+              <circle cx="58" cy="150" r="16" fill="rgb(var(--panel2))" stroke="rgb(var(--mute))" strokeWidth="2" />
+              <path d="M58 134 C70 110, 95 108, 103 122 C115 140, 105 165, 108 188 C108 216, 52 216, 52 188 C52 165, 42 155, 58 134 Z" fill="none" stroke="rgb(var(--ink))" strokeWidth="6" strokeLinecap="round" />
+              <path d="M58 134 C70 110, 95 108, 103 122 C115 140, 105 165, 108 188 C108 216, 52 216, 52 188 C52 165, 42 155, 58 134 Z" fill="none" stroke="rgb(var(--mute))" strokeWidth="2" strokeDasharray="3 3" />
+            </g>
+
+            {/* Engine Main Block & Valve Cover */}
+            <g id="engine-block">
+              <rect x="160" y="70" width="230" height="135" rx="10" fill="rgb(var(--panel2))" stroke="rgb(var(--line))" strokeWidth="2.5" />
+              {[0, 1, 2, 3, 4, 5].map((i) => (
+                <rect key={i} x={175 + i * 35} y="82" width="22" height="110" rx="4" fill="rgb(var(--panel))" stroke="rgb(var(--line))" strokeWidth="1" />
+              ))}
+              <circle cx="360" cy="100" r="12" fill="rgb(var(--amber) / .85)" stroke="rgb(var(--ink))" strokeWidth="1.5" />
+              <text x="360" y="103" textAnchor="middle" fontSize="8" fontWeight="bold" fill="rgb(var(--bg))">OIL</text>
+              <text x="275" y="145" textAnchor="middle" fontSize="13" fontWeight="900" fill="rgb(var(--mute) / .5)" letterSpacing="4">DIESEL 5.9L</text>
+            </g>
+
+            {/* Oil Dipstick Guide & Handle (x=150, y=118) */}
+            <path d="M165 170 C155 155, 150 135, 150 124" fill="none" stroke="rgb(var(--amber))" strokeWidth="3" />
+            <circle cx="150" cy="118" r="8" fill="none" stroke="#eab308" strokeWidth="3" />
+            <circle cx="150" cy="118" r="4" fill="#eab308" />
+
+            {/* Coolant Expansion Reservoir (x=290, y=52) */}
+            <rect x="260" y="36" width="60" height="34" rx="6" fill="rgb(var(--bg))" stroke="rgb(var(--cool) / .7)" strokeWidth="2" />
+            <rect x="262" y="48" width="56" height="20" rx="3" fill="rgb(var(--ok) / .35)" />
+            <line x1="264" y1="46" x2="274" y2="46" stroke="rgb(var(--ok))" strokeWidth="1.5" />
+            <text x="278" y="48" fontSize="7" fill="rgb(var(--ok))" fontWeight="bold">MAX</text>
+            <line x1="264" y1="58" x2="274" y2="58" stroke="rgb(var(--ok))" strokeWidth="1.5" />
+            <text x="278" y="60" fontSize="7" fill="rgb(var(--ok))" fontWeight="bold">MIN</text>
+
+            {/* Radiator Upper Hose (x=398, y=74) */}
+            <path d="M370 95 C380 90, 395 85, 398 74 C402 62, 408 50, 420 40" fill="none" stroke="rgb(var(--ink))" strokeWidth="14" strokeLinecap="round" />
+            <path d="M370 95 C380 90, 395 85, 398 74 C402 62, 408 50, 420 40" fill="none" stroke="rgb(var(--mute))" strokeWidth="10" strokeLinecap="round" />
+            <rect x="372" y="88" width="5" height="12" rx="1" fill="#cbd5e1" stroke="#475569" strokeWidth="0.5" />
+            <rect x="414" y="42" width="5" height="12" rx="1" fill="#cbd5e1" stroke="#475569" strokeWidth="0.5" />
+
+            {/* Air Filter Canister & Restriction Indicator (x=500, y=62) */}
+            <rect x="460" y="40" width="80" height="50" rx="8" fill="rgb(var(--panel2))" stroke="rgb(var(--line))" strokeWidth="2" />
+            <rect x="465" y="44" width="70" height="42" rx="5" fill="rgb(var(--bg))" stroke="rgb(var(--line))" strokeWidth="1" />
+            <circle cx="500" cy="62" r="10" fill="rgb(var(--panel))" stroke="rgb(var(--ok))" strokeWidth="2" />
+            <circle cx="500" cy="62" r="5" fill="rgb(var(--ok))" />
+
+            {/* Heavy Vehicle Battery (x=565, y=168) */}
+            <rect x="525" y="140" width="80" height="60" rx="6" fill="rgb(var(--bg))" stroke="rgb(var(--line))" strokeWidth="2" />
+            <rect x="535" y="144" width="20" height="8" rx="2" fill="rgb(var(--hot))" />
+            <text x="545" y="151" textAnchor="middle" fontSize="8" fontWeight="bold" fill="#fff">+</text>
+            <rect x="575" y="144" width="20" height="8" rx="2" fill="rgb(var(--ink))" />
+            <text x="585" y="151" textAnchor="middle" fontSize="8" fontWeight="bold" fill="#fff">−</text>
+            <line x1="520" y1="170" x2="610" y2="170" stroke="rgb(var(--amber) / .7)" strokeWidth="2" />
+
+            {/* Fuel Water Separator Filter (x=425, y=170) */}
+            <rect x="408" y="140" width="34" height="42" rx="4" fill="rgb(var(--panel2))" stroke="rgb(var(--line))" strokeWidth="2" />
+            <rect x="412" y="170" width="26" height="18" rx="3" fill="rgb(var(--cool) / .25)" stroke="rgb(var(--cool))" strokeWidth="1.5" />
+            <rect x="413" y="179" width="24" height="8" rx="2" fill="rgb(var(--cool) / .7)" />
+            <rect x="422" y="188" width="6" height="5" fill="rgb(var(--amber))" />
+
+            {/* Floor under Engine & Oil Drips (x=262, y=226) */}
+            <rect x="220" y="210" width="85" height="14" rx="4" fill="rgb(var(--panel))" stroke="rgb(var(--line))" strokeWidth="1.5" />
+            <ellipse cx="262" cy="232" rx="32" ry="7" fill="rgb(var(--amber) / .4)" />
+            <circle cx="262" cy="226" r="4.5" fill="rgb(var(--hot))" />
+            <circle cx="274" cy="232" r="3" fill="rgb(var(--hot))" />
+            <circle cx="250" cy="233" r="2.5" fill="rgb(var(--hot))" />
+
+            {/* Photo overlay if available */}
+            <image href="/images/engine_bay.jpg" x="15" y="10" width="610" height="240" preserveAspectRatio="xMidYMid slice" opacity="0.9" />
+
             {SPOTS.map((p) => {
               const c = cls[p.id];
               return (
-                <g key={p.id} transform={`translate(${p.x},${p.y})`} className="cursor-pointer" role="button" tabIndex={0} aria-label={L(p.name)} data-spot={p.id} data-cls={c ?? ''} onClick={() => setSel(p.id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSel(p.id); }}>
-                  <circle r="20" fill="transparent" />
-                  <circle r="13" fill={c === 'defect' ? 'rgb(var(--hot))' : c === 'ok' ? 'rgb(var(--ok))' : 'rgb(var(--cool))'} stroke={sel === p.id ? 'rgb(var(--ink))' : 'rgb(var(--bg))'} strokeWidth="3" className={!c ? 'animate-pulseRing' : ''} />
-                  <text textAnchor="middle" y="4.5" fontSize="13" fontWeight="800" fill="rgb(var(--bg))">{c === 'defect' ? '!' : c === 'ok' ? '✓' : '?'}</text>
+                <g key={p.id} transform={`translate(${p.x},${p.y})`} filter="url(#spot-shadow)" className="cursor-pointer" role="button" tabIndex={0} aria-label={L(p.name)} data-spot={p.id} data-cls={c ?? ''} onClick={() => setSel(p.id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSel(p.id); }}>
+                  <circle r="24" fill="transparent" />
+                  {!c && <circle r="18" fill="none" stroke="rgb(var(--cool))" strokeWidth="1.5" className="animate-ping opacity-60" />}
+                  <circle r="13" fill={c === 'defect' ? 'rgb(var(--hot))' : c === 'ok' ? 'rgb(var(--ok))' : 'rgb(var(--cool))'} stroke={sel === p.id ? '#ffffff' : 'rgb(var(--bg))'} strokeWidth={sel === p.id ? 3.5 : 2.5} />
+                  <text textAnchor="middle" y="4.5" fontSize="13" fontWeight="900" fill="rgb(var(--bg))">{c === 'defect' ? '!' : c === 'ok' ? '✓' : '?'}</text>
                 </g>
               );
             })}
@@ -115,7 +201,7 @@ export default function Sim07ServiceBay() {
         <div className="grid gap-3" data-testid="schedule">
           {Q.map((q, qi) => (
             <div key={qi} className="rounded-md border border-line bg-panel p-3"><p className="text-sm font-semibold mb-2">{L(q.q)}</p>
-              <div className="flex flex-wrap gap-2">{q.o.map((o, oi) => <button key={oi} className={`btn !min-h-0 !py-1.5 ${qa[qi] === oi ? '!bg-ok !text-bg' : ''}`} data-q={qi} data-o={oi} onClick={() => answer(qi, oi)}>{o}</button>)}</div></div>
+              <div className="flex flex-wrap gap-2">{q.o.map((o, oi) => <button key={oi} className={`btn !min-h-0 !py-1.5 ${qa[qi] === oi ? '!bg-ok !text-bg' : ''}`} data-q={qi} data-o={oi} disabled={qa[qi] === Q[qi].a} onClick={() => answer(qi, oi)}>{o}</button>)}</div></div>
           ))}
         </div>
       )}

@@ -96,18 +96,49 @@ export default function Sim02HeadTorque() {
             </div>
             <p className="text-sm text-mute">{s(`इस चरण का मान: ${stage.v} ${stage.unit}`, `Value for this stage: ${stage.v} ${stage.unit}`)} · <span className="readout text-cool">{cur.length}/10</span> {s('बोल्ट', 'bolts')}</p>
           </div>
-          <svg viewBox="0 0 640 210" className="w-full h-auto" role="group" aria-label="head bolts" data-testid="bolts">
-            <rect x="20" y="20" width="600" height="170" rx="18" fill="rgb(var(--panel))" stroke="rgb(var(--mute))" strokeWidth="3" />
-            {[0, 1, 2, 3, 4].map((c) => <rect key={c} x={95 + c * 115} y="48" width="52" height="114" rx="8" fill="rgb(var(--bg))" stroke="rgb(var(--line))" />)}
+          <svg viewBox="0 0 640 210" className="w-full h-auto rounded-lg overflow-hidden border border-line" role="group" aria-label="head bolts" data-testid="bolts">
+            <defs>
+              <filter id="bolt-shadow" x="-30%" y="-30%" width="160%" height="160%">
+                <feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="#000" floodOpacity="0.65"/>
+              </filter>
+            </defs>
+            <rect x="20" y="16" width="600" height="178" rx="20" fill="rgb(var(--panel))" stroke="rgb(var(--mute))" strokeWidth="3" />
+            <rect x="26" y="22" width="588" height="166" rx="16" fill="rgb(var(--panel2))" stroke="rgb(var(--line))" strokeWidth="1.5" />
+            
+            <circle cx="38" cy="34" r="6" fill="rgb(var(--line))" stroke="rgb(var(--ink))" strokeWidth="1" />
+            <circle cx="602" cy="34" r="6" fill="rgb(var(--line))" stroke="rgb(var(--ink))" strokeWidth="1" />
+            <circle cx="38" cy="176" r="6" fill="rgb(var(--line))" stroke="rgb(var(--ink))" strokeWidth="1" />
+            <circle cx="602" cy="176" r="6" fill="rgb(var(--line))" stroke="rgb(var(--ink))" strokeWidth="1" />
+
+            {[0, 1, 2, 3].map((c) => {
+              const cx = 178 + c * 115;
+              return (
+                <g key={c} id={`cylinder-bore-${c}`}>
+                  <circle cx={cx} cy="105" r="46" fill="rgb(var(--bg))" stroke="rgb(var(--amber) / .35)" strokeWidth="3" />
+                  <circle cx={cx} cy="105" r="41" fill="none" stroke="rgb(var(--line))" strokeWidth="1.5" strokeDasharray="4 3" />
+                  <circle cx={cx} cy="105" r="8" fill="rgb(var(--panel))" stroke="rgb(var(--mute))" strokeWidth="1" />
+                  <circle cx={cx} cy="92" r="4" fill="rgb(var(--amber))" />
+                  <text x={cx} y="130" textAnchor="middle" fontSize="10" fontWeight="bold" fill="rgb(var(--mute))" letterSpacing="1">CYL {c + 1}</text>
+                </g>
+              );
+            })}
+
+            {[0, 1, 2, 3, 4].map((c) => (
+              <g key={`coolant-${c}`}>
+                <ellipse cx={121 + c * 115} cy="105" rx="10" ry="16" fill="rgb(var(--cool) / .15)" stroke="rgb(var(--cool) / .4)" strokeWidth="1" />
+              </g>
+            ))}
+
             {IDS.map((id) => {
               const c = col(id), top = id % 2 === 1; const bx = 121 + c * 115; const by = top ? 50 : 160;
               const d = cur.includes(id); const wasPrev = done.slice(0, Math.max(0, st)).every((a) => a.includes(id));
               return (
                 <g key={id} className="cursor-pointer" role="button" tabIndex={0} aria-label={`bolt ${id}`} data-bolt={id} data-done={d ? '1' : '0'} onClick={() => tap(id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') tap(id); }}
-                  style={{ transformOrigin: `${bx}px ${by}px`, animation: shake === id ? 'rise .2s' : undefined }}>
-                  <circle cx={bx} cy={by} r="26" fill="transparent" />
-                  <circle cx={bx} cy={by} r="19" fill={d ? boltColor[st] : wasPrev && st > 0 ? 'rgb(var(--mute) / .6)' : 'rgb(var(--panel2))'} stroke={flash === id ? 'rgb(var(--cool))' : 'rgb(var(--ink))'} strokeWidth={flash === id ? 5 : 2.5} className={flash === id ? 'animate-pulse' : ''} />
-                  <path d={`M${bx - 8} ${by - 4.6}l8 -4.6l8 4.6v9.2l-8 4.6l-8 -4.6z`} fill="none" stroke="rgb(var(--ink))" strokeWidth="1.8" />
+                  filter="url(#bolt-shadow)"
+                  style={{ transformOrigin: `${bx}px ${by}px`, animation: shake === id ? 'shake .35s ease-in-out' : undefined }}>
+                  <circle cx={bx} cy={by} r="25" fill="rgb(var(--panel))" stroke="rgb(var(--line))" strokeWidth="1.5" />
+                  <circle cx={bx} cy={by} r="20" fill={d ? boltColor[st] : wasPrev && st > 0 ? 'rgb(var(--mute) / .6)' : 'rgb(var(--panel2))'} stroke={flash === id ? 'rgb(var(--cool))' : 'rgb(var(--ink))'} strokeWidth={flash === id ? 4 : 2.5} className={flash === id ? 'animate-pulse' : ''} />
+                  <path d={`M${bx - 9} ${by - 5.2}l9 -5.2l9 5.2v10.4l-9 5.2l-9 -5.2z`} fill="none" stroke="rgb(var(--ink))" strokeWidth="1.8" />
                   <text x={bx} y={by + 4.5} textAnchor="middle" fontSize="12" fontWeight="800" fill={d ? 'rgb(var(--bg))' : 'rgb(var(--ink))'} fontFamily="JetBrains Mono, monospace">{id}</text>
                 </g>
               );

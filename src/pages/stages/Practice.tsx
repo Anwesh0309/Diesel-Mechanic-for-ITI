@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import type { Unit } from '@/data/types';
 import { useT } from '@/translations';
 import { actions, useProgress } from '@/store/progress';
@@ -11,7 +11,8 @@ export default function Practice({ unit }: { unit: Unit }) {
   const p = useProgress();
   const total = unit.practice.length;
   const n = unit.practice.filter((_, i) => p.ticks[`${unit.id}:${i}`]).length;
-  useEffect(() => { if (n === total && total > 0) { actions.completeStage(unit.id, 'practice', 20); playFanfare(); } }, [n, total, unit.id]);
+  const fanfareFired = useRef(false);
+  useEffect(() => { if (n === total && total > 0 && !fanfareFired.current) { fanfareFired.current = true; actions.completeStage(unit.id, 'practice', 20); playFanfare(); } }, [n, total, unit.id]);
   return (
     <div className="grid gap-4 stage-in" data-testid="stage-practice">
       <p className="text-sm text-mute max-w-2xl">{t.unit.practiceHelp}</p>

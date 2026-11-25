@@ -78,23 +78,25 @@ export default function Sim10Hazards() {
       intro={bi('वर्कशॉप के दृश्य में ख़तरे खोजें और उनके सही उपाय चुनें, फिर हर काम के लिए PPE तय करें और आग बुझाने का क्रम सीखें।', 'Find hazards in the workshop scene and pick the right remedies, then choose PPE for each job and learn the fire-fighting sequence.')}>
       {phase === 0 && (
         <div className="grid gap-3" data-testid="hazard-scene">
-          <svg viewBox="0 0 640 300" className="w-full h-auto" role="group" aria-label="workshop scene">
-            <rect width="640" height="300" fill="rgb(var(--panel))" rx="10" /><rect y="268" width="640" height="32" fill="rgb(var(--panel2))" />
-            <rect x="60" y="56" width="120" height="70" rx="5" fill="rgb(var(--panel2))" stroke="rgb(var(--line))" /><rect x="300" y="52" width="60" height="42" rx="4" fill="rgb(var(--ok) / .25)" stroke="rgb(var(--ok))" /><path d="M330 60v26M317 73h26" stroke="rgb(var(--ok))" strokeWidth="5" />
-            <rect x="570" y="70" width="46" height="130" fill="rgb(var(--ok) / .2)" stroke="rgb(var(--ok))" /><rect x="545" y="150" width="40" height="46" fill="rgb(var(--amber) / .6)" /><rect x="580" y="170" width="30" height="30" fill="rgb(var(--amber) / .5)" />
-            <ellipse cx="110" cy="276" rx="56" ry="9" fill="rgb(var(--amber) / .55)" />
-            <rect x="200" y="196" width="130" height="34" rx="10" fill="rgb(var(--mute))" /><circle cx="226" cy="236" r="12" fill="rgb(var(--ink) / .7)" /><circle cx="304" cy="236" r="12" fill="rgb(var(--ink) / .7)" /><rect x="258" y="232" width="14" height="32" fill="rgb(var(--hot))" />
-            <rect x="395" y="190" width="70" height="20" fill="rgb(var(--mute))" /><circle cx="430" cy="175" r="16" fill="none" stroke="rgb(var(--ink))" strokeWidth="4" />{[0, 1, 2, 3, 4].map((i) => <line key={i} x1={448} y1={172} x2={470 + i * 6} y2={150 + (i % 2) * 16} stroke="rgb(var(--amber))" strokeWidth="2" />)}
-            <rect x="490" y="236" width="30" height="30" rx="4" fill="rgb(var(--hot) / .75)" /><rect x="500" y="228" width="10" height="9" fill="rgb(var(--hot))" />
-            <path d="M540 266q14 -26 28 0t28 0" fill="none" stroke="rgb(var(--amber))" strokeWidth="4" />
-            <g transform="translate(232,98)"><circle r="12" fill="rgb(var(--mute))" /><path d="M-13 -4a13 11 0 0 1 26 0z" fill="rgb(var(--amber))" /><rect x="-12" y="12" width="24" height="46" rx="6" fill="rgb(var(--cool) / .6)" /></g>
+          <svg viewBox="0 0 640 300" className="w-full h-auto rounded-lg overflow-hidden border border-line" role="group" aria-label="workshop scene">
+            <defs>
+              <filter id="pin-shadow" x="-30%" y="-30%" width="160%" height="160%">
+                <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="#000" floodOpacity="0.65"/>
+              </filter>
+            </defs>
+            <rect width="640" height="300" fill="rgb(var(--panel))" />
+            <rect y="240" width="640" height="60" fill="rgb(var(--panel2))" />
+            <line x1="0" y1="240" x2="640" y2="240" stroke="rgb(var(--line))" strokeWidth="2" />
+            <image href="/images/workshop_hazards.jpg" x="0" y="0" width="640" height="300" preserveAspectRatio="xMidYMid slice" opacity="0.95" />
+            <rect width="640" height="300" fill="rgb(var(--bg) / .12)" />
             {ITEMS.map((it) => {
               const done = fixed.includes(it.id); const fd = found.includes(it.id);
               return (
-                <g key={it.id} transform={`translate(${it.x},${it.y})`} className="cursor-pointer" role="button" tabIndex={0} aria-label={L(it.name)} data-item={it.id} data-state={done ? 'fixed' : fd ? 'found' : ''} onClick={() => tapItem(it.id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') tapItem(it.id); }}>
-                  <circle r="24" fill="transparent" />
-                  <circle r="12" fill={done ? 'rgb(var(--ok))' : fd ? 'rgb(var(--hot))' : 'rgb(var(--cool) / .9)'} stroke={sel === it.id ? 'rgb(var(--ink))' : 'rgb(var(--bg))'} strokeWidth="3" className={!fd && !done ? 'animate-pulseRing' : ''} />
-                  <text textAnchor="middle" y="4.5" fontSize="13" fontWeight="800" fill="rgb(var(--bg))">{done ? '✓' : fd ? '!' : '?'}</text>
+                <g key={it.id} transform={`translate(${it.x},${it.y})`} filter="url(#pin-shadow)" className="cursor-pointer" role="button" tabIndex={0} aria-label={L(it.name)} data-item={it.id} data-state={done ? 'fixed' : fd ? 'found' : ''} onClick={() => tapItem(it.id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') tapItem(it.id); }}>
+                  <circle r="26" fill="transparent" />
+                  {!fd && !done && <circle r="20" fill="none" stroke="rgb(var(--cool))" strokeWidth="1.5" className="animate-ping opacity-60" />}
+                  <circle r="14" fill={done ? 'rgb(var(--ok))' : fd ? 'rgb(var(--hot))' : 'rgb(var(--cool))'} stroke={sel === it.id ? '#ffffff' : 'rgb(var(--bg))'} strokeWidth={sel === it.id ? 3.5 : 2.5} />
+                  <text textAnchor="middle" y="5" fontSize="13" fontWeight="900" fill="rgb(var(--bg))">{done ? '✓' : fd ? '!' : '?'}</text>
                 </g>
               );
             })}

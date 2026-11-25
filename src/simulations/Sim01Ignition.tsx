@@ -129,7 +129,7 @@ export default function Sim01Ignition() {
                 <div key={qi} className="rounded-md border border-line bg-panel p-3">
                   <p className="text-sm font-semibold mb-2">{L(q.q)}</p>
                   <div className="flex flex-wrap gap-2">{q.o.map((o, oi) => (
-                    <button key={oi} onClick={() => answer(qi, oi)} data-q={qi} data-o={oi} className={`btn !min-h-0 !py-1.5 ${qa[qi] === oi ? '!bg-ok !text-bg' : ''}`}>{o}</button>
+                    <button key={oi} onClick={() => answer(qi, oi)} data-q={qi} data-o={oi} disabled={qa[qi] === questions[qi].a} className={`btn !min-h-0 !py-1.5 ${qa[qi] === oi ? '!bg-ok !text-bg' : ''}`}>{o}</button>
                   ))}</div>
                 </div>
               ))}
