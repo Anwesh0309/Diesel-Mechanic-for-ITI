@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root, [data-theme='dark'] {
+  --bg: 14 19 24; --panel: 22 29 36; --panel2: 31 40 50; --line: 46 58 70;
+  --ink: 232 238 244; --mute: 140 156 172;
+  --cool: 34 211 238; --amber: 251 191 36; --hot: 248 90 70; --ok: 74 222 128;
+  color-scheme: dark;
+}
+[data-theme='light'] {
+  --bg: 233 238 243; --panel: 255 255 255; --panel2: 243 246 250; --line: 206 215 225;
+  --ink: 16 24 32; --mute: 85 100 116;
+  --cool: 8 135 168; --amber: 196 108 0; --hot: 214 40 40; --ok: 21 150 70;
+  color-scheme: light;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    @apply bg-bg text-ink font-sans antialiased;
+    background-image:
+      linear-gradient(rgb(var(--line) / .28) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--line) / .28) 1px, transparent 1px);
+    background-size: 36px 36px;
+    background-position: -1px -1px;
+    min-height: 100vh;
+  }
+  h1, h2, h3, .font-head { font-family: 'Barlow Condensed', 'Noto Sans Devanagari', 'Arial Narrow', sans-serif; letter-spacing: .01em; }
+  :lang(hi) h1, :lang(hi) h2, :lang(hi) h3 { letter-spacing: 0; }
+  button { @apply select-none; touch-action: manipulation; }
+  :focus-visible { outline: 2px solid rgb(var(--cool)); outline-offset: 2px; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: rgb(var(--line)); border-radius: 8px; }
+  input[type='range'] { accent-color: rgb(var(--cool)); }
+}
+
+@layer components {
+  .panel { @apply bg-panel border border-line rounded-lg relative; }
+  .panel-rivets::before, .panel-rivets::after {
+    content: ''; position: absolute; top: 7px; width: 5px; height: 5px; border-radius: 50%;
+    background: rgb(var(--line)); box-shadow: inset 0 0 0 1px rgb(var(--mute) / .25);
+  }
+  .panel-rivets::before { left: 7px; } .panel-rivets::after { right: 7px; }
+  .btn { @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md font-semibold text-sm border border-line bg-panel2 text-ink transition active:scale-[.97] hover:border-cool/60 disabled:opacity-40 disabled:pointer-events-none; min-height: 40px; }
+  .btn-cool { @apply bg-cool text-bg border-transparent hover:bg-cool/90; }
+  .btn-amber { @apply bg-amber text-bg border-transparent hover:bg-amber/90; }
+  .chip { @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider; }
+  .kicker { @apply text-[11px] font-bold uppercase tracking-[.18em] text-cool; }
+  .hazard { background: repeating-linear-gradient(-45deg, rgb(var(--amber)) 0 10px, rgb(var(--bg)) 10px 20px); }
+  .readout { @apply font-mono font-bold tabular-nums; }
+  .stage-in { animation: rise .35s ease-out both; }
+}
