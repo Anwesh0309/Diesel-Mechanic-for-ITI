@@ -15,12 +15,31 @@ export interface ProgressState {
 }
 
 const KEY = 'diesel-skill-lab:v1';
-const fresh = (): ProgressState => ({ lang: 'hi', theme: 'dark', done: {}, ticks: {}, applied: {}, simBest: {}, quizBest: {}, xp: 0, attempts: [] });
+const MANUAL_LANG_KEY = 'diesel-skill-lab:manual-lang';
+
+/**
+ * Whenever the user starts the module, it starts with Hindi language ('hi').
+ * It only switches to English ('en') when the user manually toggles it in the UI.
+ * The manual choice is remembered within the active session so refreshing preserves
+ * the choice, but fresh starts always begin in Hindi.
+ */
+function getInitialLang(): Lang {
+  try {
+    const manual = sessionStorage.getItem(MANUAL_LANG_KEY);
+    if (manual === 'en' || manual === 'hi') return manual;
+  } catch { /* ignore */ }
+  return 'hi';
+}
+
+const fresh = (): ProgressState => ({ lang: getInitialLang(), theme: 'dark', done: {}, ticks: {}, applied: {}, simBest: {}, quizBest: {}, xp: 0, attempts: [] });
 
 function load(): ProgressState {
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) return { ...fresh(), ...JSON.parse(raw) };
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      return { ...fresh(), ...parsed, lang: getInitialLang() };
+    }
   } catch { /* ignore */ }
   return fresh();
 }
@@ -36,7 +55,10 @@ export function useProgress(): ProgressState {
 }
 
 export const actions = {
-  setLang: (lang: Lang) => set({ lang }),
+  setLang: (lang: Lang) => {
+    try { sessionStorage.setItem(MANUAL_LANG_KEY, lang); } catch { /* ignore */ }
+    set({ lang });
+  },
   toggleTheme: () => set({ theme: state.theme === 'dark' ? 'light' : 'dark' }),
   /** marks a stage done once; returns true if it was new (awards XP) */
   completeStage(unit: number, stage: string, xp = 10) {
@@ -60,7 +82,11 @@ export const actions = {
     set({ quizBest: { ...state.quizBest, [unit]: Math.max(state.quizBest[unit] ?? 0, score) }, attempts: [...state.attempts, { unit, kind: 'quiz', score, at: Date.now() }] });
   },
   addXp: (n: number) => set({ xp: state.xp + n }),
-  reset: () => { state = { ...fresh(), lang: state.lang, theme: state.theme }; emit(); },
+  reset: () => {
+    try { sessionStorage.removeItem(MANUAL_LANG_KEY); } catch { /* ignore */ }
+    state = { ...fresh(), lang: 'hi', theme: state.theme };
+    emit();
+  },
 };
 
 export const isDone = (s: ProgressState, unit: number, stage: string) => !!s.done[`${unit}:${stage}`];

@@ -11,7 +11,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <title>डीज़ल मैकेनिक स्किल लैब · Diesel Mechanic Skill Lab</title>
     <script>
-      try { var s = JSON.parse(localStorage.getItem('diesel-skill-lab:v1') || '{}'); if (s.theme) document.documentElement.dataset.theme = s.theme; if (s.lang) document.documentElement.lang = s.lang; } catch (e) {}
+      try {
+        var s = JSON.parse(localStorage.getItem('diesel-skill-lab:v1') || '{}');
+        if (s.theme) document.documentElement.dataset.theme = s.theme;
+        var manual = sessionStorage.getItem('diesel-skill-lab:manual-lang');
+        document.documentElement.lang = manual === 'en' ? 'en' : 'hi';
+      } catch (e) {}
     </script>
   </head>
   <body>
